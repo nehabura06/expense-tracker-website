@@ -1,234 +1,116 @@
-// // import React, { useState } from 'react';
-// // import { useNavigate } from 'react-router-dom';
-// // import axios from 'axios';
-
-// // const Signup = () => {
-// //     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-// //     const [error, setError] = useState('');
-// //     const navigate = useNavigate();
-
-// //     const handleChange = (e) => {
-// //         setFormData({ ...formData, [e.target.name]: e.target.value });
-// //     };
-
-// //     const handleSubmit = async (e) => {
-// //         e.preventDefault();
-// //         setError(""); // Clear previous errors
-
-// //         try {
-// //             const res = await axios.post('http://localhost:5000/api/auth/signup', formData);
-// //             alert(res.data.msg); // Show success message
-// //             navigate('/login'); // Redirect to login after signup
-// //         } catch (error) {
-// //             setError(error.response?.data?.msg || 'Signup failed. Try again.'); // Prevent crashes
-// //         }
-// //     };
-
-// //     return (
-// //         <div className="signup-container">
-// //             <h2>Signup</h2>
-// //             {error && <p className="error">{error}</p>}
-// //             <form onSubmit={handleSubmit}>
-// //                 <input 
-// //                     type="text" 
-// //                     name="name" 
-// //                     placeholder="Name" 
-// //                     value={formData.name}
-// //                     onChange={handleChange} 
-// //                     required 
-// //                 />
-// //                 <input 
-// //                     type="email" 
-// //                     name="email" 
-// //                     placeholder="Email" 
-// //                     value={formData.email}
-// //                     onChange={handleChange} 
-// //                     required 
-// //                 />
-// //                 <input 
-// //                     type="password" 
-// //                     name="password" 
-// //                     placeholder="Password" 
-// //                     value={formData.password}
-// //                     onChange={handleChange} 
-// //                     required 
-// //                 />
-// //                 <button type="submit">Signup</button>
-// //             </form>
-// //         </div>
-// //     );
-// // };
-
-// // export default Signup;
-
-// import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import axios from 'axios';
-
-// const Signup = () => {
-//     const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-//     const [error, setError] = useState('');
-//     const [loading, setLoading] = useState(false); // Disable button during API call
-//     const navigate = useNavigate();
-
-//     const handleChange = (e) => {
-//         setFormData({ ...formData, [e.target.name]: e.target.value });
-//     };
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         setError(""); // Clear previous errors
-//         setLoading(true); // Start loading
-
-//         try {
-//             const res = await axios.post(
-//                 'http://localhost:5000/api/auth/signup',
-//                 formData,
-//                 { headers: { "Content-Type": "application/json" } } // Ensure correct headers
-//             );
-
-//             alert("Signup successful! Please log in."); // Notify the user
-//             navigate('/login'); // Redirect to login after signup
-//         } catch (error) {
-//             console.error("Signup Error:", error);
-//             setError(error.response?.data?.msg || 'Signup failed. Try again.');
-//         } finally {
-//             setLoading(false); // Stop loading
-//         }
-//     };
-
-//     return (
-//         <div className="signup-container">
-//             <h2>Signup</h2>
-//             {error && <p className="error">{error}</p>}
-//             <form onSubmit={handleSubmit}>
-//                 <input 
-//                     type="text" 
-//                     name="name" 
-//                     placeholder="Name" 
-//                     value={formData.name}
-//                     onChange={handleChange} 
-//                     required 
-//                 />
-//                 <input 
-//                     type="email" 
-//                     name="email" 
-//                     placeholder="Email" 
-//                     value={formData.email}
-//                     onChange={handleChange} 
-//                     required 
-//                 />
-//                 <input 
-//                     type="password" 
-//                     name="password" 
-//                     placeholder="Password" 
-//                     value={formData.password}
-//                     onChange={handleChange} 
-//                     required 
-//                 />
-//                 <button type="submit" disabled={loading}>
-//                     {loading ? "Signing up..." : "Signup"}
-//                 </button>
-//             </form>
-//         </div>
-//     );
-// };
-
-// export default Signup;
-
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import "../styles/signup.css";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 
 const Signup = () => {
-    const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
-    };
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
-        setSuccess("");
-        setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setLoading(true);
 
-        if (formData.password.length < 6) {
-            setError("Password must be at least 6 characters long.");
-            setLoading(false);
-            return;
-        }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      setLoading(false);
+      return;
+    }
 
-        try {
-            const res = await axios.post(
-                'http://localhost:5000/api/auth/signup',
-                formData,
-                { headers: { "Content-Type": "application/json" } }
-            );
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/signup",
+        formData,
+        { headers: { "Content-Type": "application/json" } }
+      );
 
-            console.log("Signup Response:", res.data); // Debugging line
-            if (res.status === 201 || res.status === 200) {
-                setSuccess("Signup successful! You can now login.");
-                setFormData({ name: '', email: '', password: '' }); // Clear form
-            } else {
-                setError("Unexpected response. Please try again.");
-            }
-        } catch (error) {
-            console.error("Signup Error:", error);
-            setError(error.response?.data?.msg || 'Signup failed. Try again.');
-        } finally {
-            setLoading(false);
-        }
-    };
+      if (res.status === 201 || res.status === 200) {
+        setSuccess("Signup successful! Redirecting to login...");
+        setFormData({ name: "", email: "", password: "" });
+        setTimeout(() => navigate("/login"), 2000);
+      } else {
+        setError("Unexpected response. Please try again.");
+      }
+    } catch (error) {
+      setError(error.response?.data?.msg || "Signup failed. Try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className="signup-container">
-            <h2>Signup</h2>
-            {error && <p className="error">{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    name="name"
-                    placeholder="Name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password (min. 6 characters)"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                />
-                <button type="submit" disabled={loading}>
-                    {loading ? "Signing up..." : "Signup"}
-                </button>
-            </form>
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+        <h2 className="text-2xl font-semibold text-center text-gray-800 mb-4">Signup</h2>
+        {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
+        {success && <p className="text-green-500 text-sm text-center mb-4">{success}</p>}
 
-            {/* ✅ Login Button with Text */}
-            <p className="login-text">
-                Already have an account?{" "}
-                <Link to="/login">
-                    <button className="login-btn">Login</button>
-                </Link>
-            </p>
-        </div>
-    );
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-700 font-medium">Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Enter your name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-gray-700 font-medium">Email</label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-gray-700 font-medium">Password</label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+          
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+          >
+            {loading ? "Signing up..." : "Signup"}
+          </button>
+        </form>
+
+        <p className="text-center text-gray-600 text-sm mt-4">
+          Already have an account? {" "}
+          <Link to="/login" className="text-blue-500 hover:underline">
+            Login
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
 };
 
 export default Signup;
