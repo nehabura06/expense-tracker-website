@@ -9,15 +9,34 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Handle input change
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value.trim() });
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "name" ? value.trimStart() : value.trim(),
+    }));
   };
 
+  // Validate email format
+  const validateEmail = (email) => {
+    return /^\S+@\S+\.\S+$/.test(email);
+  };
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
     setLoading(true);
+
+    // Client-side validations
+    if (!validateEmail(formData.email)) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
 
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters long.");
@@ -36,11 +55,9 @@ const Signup = () => {
         setSuccess("Signup successful! Redirecting to login...");
         setFormData({ name: "", email: "", password: "" });
         setTimeout(() => navigate("/login"), 2000);
-      } else {
-        setError("Unexpected response. Please try again.");
       }
     } catch (error) {
-      setError(error.response?.data?.msg || "Signup failed. Try again.");
+      setError(error.response?.data?.msg || "Signup failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -48,12 +65,14 @@ const Signup = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-4">Signup</h2>
+        
         {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
         {success && <p className="text-green-500 text-sm text-center mb-4">{success}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Name Input */}
           <div>
             <label className="block text-gray-700 font-medium">Name</label>
             <input
@@ -66,7 +85,8 @@ const Signup = () => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
-          
+
+          {/* Email Input */}
           <div>
             <label className="block text-gray-700 font-medium">Email</label>
             <input
@@ -79,7 +99,8 @@ const Signup = () => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
-          
+
+          {/* Password Input */}
           <div>
             <label className="block text-gray-700 font-medium">Password</label>
             <input
@@ -92,18 +113,23 @@ const Signup = () => {
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
-          
+
+          {/* Signup Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            className={`w-full py-2 rounded-lg text-white transition duration-300 ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
           >
             {loading ? "Signing up..." : "Signup"}
           </button>
         </form>
 
         <p className="text-center text-gray-600 text-sm mt-4">
-          Already have an account? {" "}
+          Already have an account?{" "}
           <Link to="/login" className="text-blue-500 hover:underline">
             Login
           </Link>
@@ -114,3 +140,4 @@ const Signup = () => {
 };
 
 export default Signup;
+

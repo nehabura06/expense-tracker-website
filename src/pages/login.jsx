@@ -6,6 +6,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Redirect if already logged in
@@ -15,26 +16,48 @@ const Login = () => {
     }
   }, [navigate]);
 
+  // Validate email format
+  const validateEmail = (email) => {
+    return /^\S+@\S+\.\S+$/.test(email);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
+
+    // Client-side validation
+    if (!validateEmail(email.trim())) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
+    if (password.trim().length < 6) {
+      setError("Password must be at least 6 characters long.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
-        { email, password },
-        { headers: { "Content-Type": "application/json" } }
+        { email: email.trim(), password: password.trim() },
+        // { headers: { "Content-Type": "application/json" } }
+        { withCredentials: true } // ✅ Added withCredentials: true
       );
 
       if (response.data?.token) {
-        localStorage.setItem("token", response.data.token);
+        // localStorage.setItem("token", response.data.token);
+        localStorage.setItem("token", `Bearer ${response.data.token}`);  // ✅ Fix token format
         navigate("/dashboard");
       } else {
-        setError("Invalid response from server");
+        setError("Invalid response from server.");
       }
     } catch (err) {
-      console.error("Login Error:", err);
       setError(err.response?.data?.msg || "Login failed. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,7 +78,7 @@ const Login = () => {
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value.trim())}
               required
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
@@ -68,7 +91,7 @@ const Login = () => {
               type="password"
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value.trim())}
               required
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
@@ -77,9 +100,13 @@ const Login = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            disabled={loading}
+            className={`w-full py-2 rounded-lg text-white transition duration-300 ${loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+              }`}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
