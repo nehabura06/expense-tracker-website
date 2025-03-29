@@ -16,11 +16,6 @@ router.post("/set", authMiddleware, async (req, res) => {
     category = category.trim();
   }
 
-  // // Validate input
-  // if (!category || budgetAmount === undefined) {
-  //   return res.status(400).json({ message: "All fields are required." });
-  // }
-
   // ✅ Input Validation
   if (!category || isNaN(budgetAmount) || budgetAmount <= 0 || budgetAmount > 10000000) {
     return res.status(400).json({
@@ -28,37 +23,6 @@ router.post("/set", authMiddleware, async (req, res) => {
         "Invalid input. Provide a valid category and budget amount greater than zero.",
     });
   }
-  // category = category.trim(); // Now safe to trim
-  //   try {
-  //     let budget = await Budget.findOne({ userId, category });
-
-  //     if (budget) {
-  //       budget.budgetAmount = Number(budgetAmount); // Update existing budget
-  //       await budget.save();
-  //     } else {
-  //       try {
-  //         budget = new Budget({
-  //           userId,
-  //           category,
-  //           budgetAmount: Number(budgetAmount),
-  //         });
-  //         await budget.save();
-  //       } catch (err) {
-  //         if (err.code === 11000) {
-  //           // MongoDB duplicate key error
-  //           return res
-  //             .status(400)
-  //             .json({ message: "Budget for this category already exists." });
-  //         }
-  //         throw err;
-  //       }
-  //     }
-
-  //     res.json({ message: "Budget set successfully", budget });
-  //   } catch (error) {
-  //     console.error("Error in /set route:", error.message);
-  //     res.status(500).json({ message: "Server Error", error: error.message });
-  //   }
   const existingBudget = await Budget.findOne({ userId, category });
 
   if (existingBudget) {
@@ -117,6 +81,29 @@ router.get("/overall", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("Error in GET /overall route:", error.message);
     res.status(500).json({ message: "Server Error", error: error.message });
+  }
+});
+
+// ✅ Update Budget by ID
+router.put("/:id", authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { category, budgetAmount } = req.body;
+
+    const updatedBudget = await Budget.findByIdAndUpdate(
+      id,
+      { category, budgetAmount },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedBudget) {
+      return res.status(404).json({ message: "Budget not found" });
+    }
+
+    res.json(updatedBudget);
+  } catch (error) {
+    console.error("Error updating budget:", error.message);
+    res.status(500).json({ message: "Server Error" });
   }
 });
 module.exports = router;

@@ -5,7 +5,6 @@ module.exports = function (req, res, next) {
   // console.log("Received Token:", token); // Debugging
   console.log("Received Token:", token || "No Token Provided"); // Debugging
 
-
   // if (!token) {
   //   token = req.cookies?.token; // ✅ Now reassigning is possible
   // }
@@ -17,14 +16,13 @@ module.exports = function (req, res, next) {
   }
 
   try {
-    if (token.startsWith("Bearer ")) {
-      // token = token.replace("Bearer ", ""); // ✅ Prevent errors
-      token = token.slice(7); // Remove 'Bearer ' using slice for better readability
+    if (token.includes("Bearer ")) {
+      token = token.replace(/Bearer\s+/g, "").trim(); // Remove extra Bearer occurrences
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (!decoded.id) {
+    if (!decoded?.id) {
       return res.status(400).json({ message: "Invalid Token: Missing userId" });
     }
 
@@ -36,4 +34,3 @@ module.exports = function (req, res, next) {
     res.status(400).json({ message: "Invalid Token" });
   }
 };
-
