@@ -5,20 +5,6 @@ import Signup from "./pages/signup";
 import Login from "./pages/login";
 import Dashboard from "./pages/dashboard";
 import BudgetPage from "./pages/budgetPage";
-// import jwtDecode from 'jwt-decode';
-
-// // Token validation
-// const isTokenValid = () => {
-//     const token = localStorage.getItem("token");
-//     if (!token) return false;
-//     try {
-//       const decoded = jwtDecode(token);
-//       return decoded.exp * 1000 > Date.now();
-//     } catch (error) {
-//       console.error("Invalid token:", error);
-//       return false;
-//     }
-//   };
 
 const ProtectedRoute = ({ element }) => {
     const token = localStorage.getItem("token");
